@@ -1,6 +1,7 @@
-import sys, logging
+import logging
 import os
 import requests
+import sys
 import time as t
 
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ load_dotenv()
 
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN_ENV')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN_ENV')
-TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID_ENV') 
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID_ENV')
 
 RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
@@ -35,7 +36,9 @@ logger = logging.getLogger(__name__)
 handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(handler)
 
+
 def send_message(bot, message):
+    """Отправка сообщения в Телеграм."""
     bot.send_message(TELEGRAM_CHAT_ID, message)
     logger.info('Сообщение для sat0304_bot отправлено')
 
@@ -83,22 +86,27 @@ def parse_status(homework):
     homework_name = homework.get('homework_name')
     homework_status = homework.get('status')
     if homework_name is not None:
-        if (homework_status is not None) and (
-            homework_status in HOMEWORK_STATUSES):
+        if ((homework_status is not None)
+        and (homework_status in HOMEWORK_STATUSES)):
             verdict = HOMEWORK_STATUSES.get(homework_status)
-            logger.info(f'Изменился статус проверки работы'
-                f'"{homework_name}". {verdict}')
-            return (f'Изменился cтатус проверки работы'
-                f'"{homework_name}". {verdict}')
+            logger.info(
+                f'Изменился статус проверки работы'
+                f'"{homework_name}". {verdict}'
+            )
+            return (
+                f'Изменился cтатус проверки работы'
+                f'"{homework_name}". {verdict}'
+            )
         else:
             logger.error(
-                f'Некорректный статус проверки на' 
+                f'Некорректный статус проверки на'
                 f'API Практикум.Домашка'
             )
-            return (f'Не изменился cтатус проверки работы')
+            return ('Не изменился cтатус проверки работы')
     else:
         logger.error('Некорректное имя работы на API Практикум.Домашка')
-        return (f'Не изменился cтатус проверки работы')
+        return ('Не изменился cтатус проверки работы')
+
 
 def check_tokens():
     """Проверяем доступность переменных окружения."""
@@ -149,6 +157,7 @@ def main():
         else:
             logger.debug('Ошибок нет: бот работает')
             logger.debug(f'Неизменный статус проверки {old_homework}')
+
 
 if __name__ == '__main__':
     main()
