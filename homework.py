@@ -87,7 +87,7 @@ def parse_status(homework):
     homework_status = homework.get('status')
     if homework_name is not None:
         if ((homework_status is not None)
-        and (homework_status in HOMEWORK_STATUSES)):
+            and (homework_status in HOMEWORK_STATUSES)):
             verdict = HOMEWORK_STATUSES.get(homework_status)
             logger.info(
                 f'Изменился статус проверки работы'
@@ -98,10 +98,8 @@ def parse_status(homework):
                 f'"{homework_name}". {verdict}'
             )
         else:
-            logger.error(
-                f'Некорректный статус проверки на'
-                f'API Практикум.Домашка'
-            )
+            logger.error(f'Некорректный статус проверки на'
+                f'API Практикум.Домашка')
             return ('Не изменился cтатус проверки работы')
     else:
         logger.error('Некорректное имя работы на API Практикум.Домашка')
