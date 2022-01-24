@@ -88,7 +88,7 @@ def parse_status(homework):
     old_homework_name = 'Старая'
     try:
         homework is None
-    except:
+    except ValueError:
         logger.error('Работа на проверку не загружена')
         raise
     else:
@@ -97,7 +97,7 @@ def parse_status(homework):
         homework_status = homework.get('status')
         try:
             homework_status is None
-        except:
+        except ValueError:
             logger.error('Статус работы - пустой')
             raise
         else:
