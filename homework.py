@@ -8,9 +8,7 @@ from dotenv import load_dotenv
 from http import HTTPStatus
 from telegram import Bot
 
-
 load_dotenv()
-
 
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN_ENV')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN_ENV')
@@ -19,7 +17,6 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID_ENV')
 RETRY_TIME = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
-
 
 HOMEWORK_STATUSES = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
@@ -155,7 +152,7 @@ def main():
                 t.sleep(RETRY_TIME)
         else:
             logger.debug('Ошибок нет: бот работает')
-            logger.debug(f'Неизменный статус проверки {old_homework}')
+            logger.debug(f'Прежняя информация: {old_homework}')
 
 
 if __name__ == '__main__':
