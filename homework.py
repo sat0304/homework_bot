@@ -85,12 +85,12 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлечение данных из ответа API сайта Практикум.Домашка."""
-    if homework[0] is None:
+    if homework['id'] == 0:
         logger.error('Работа на проверку не загружена')
         return KeyError('Пустой список работ')
     else:
-        homework_name = homework.get('homework_name')
-        if homework_name is None:
+        homework_name_1 = homework.get('homework_name')
+        if homework_name_1 is None:
             logger.error('Нет данных о работе')
             return KeyError('Нет данных о работе')
         else:
@@ -102,17 +102,9 @@ def parse_status(homework):
                 homework_status = homework.get('status')
                 if homework_status in HOMEWORK_STATUSES:
                     verdict = HOMEWORK_STATUSES.get(homework_status)
-                    logger.info(
-                        f'Cтатус проверки работы'
-                        f'"{homework_name}". {verdict}'
-                    )
-                    return (
-                        f'Cтатус проверки работы'
-                        f'"{homework_name}". {verdict}'
-                    )
-                else:
-                    logger.error('Некорректный статус проверки на API')
-                    return KeyError('Не изменился cтатус работы')
+                    text = 'Изменился статус проверки работы '
+                    logger.info(f'{text}"{homework_name_1}": {verdict}')
+                    return (f'{text}"{homework_name_1}": {verdict}')
 
 
 def check_tokens():
