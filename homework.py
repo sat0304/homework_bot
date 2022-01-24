@@ -127,7 +127,7 @@ def main():
     """Основная логика работы бота."""
     if check_tokens():
         bot = Bot(token=TELEGRAM_TOKEN)
-        current_timestamp = int(t.time())
+        current_timestamp = int(t.time()) - RETRY_TIME
         old_homework = None
     else:
         sys.exit(1)
