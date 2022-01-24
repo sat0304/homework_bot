@@ -85,36 +85,34 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлечение данных из ответа API сайта Практикум.Домашка."""
-    old_homework_name = 'Старая'
-    try:
-        homework is None
-    except ValueError:
+    if homework is []:
         logger.error('Работа на проверку не загружена')
-        raise
+        return KeyError('Пустой список работ')
     else:
         homework_name = homework.get('homework_name')
-        old_homework_name = homework_name
-        homework_status = homework.get('status')
-        try:
-            homework_status is None
-        except ValueError:
-            logger.error('Статус работы - пустой')
-            raise
+        if homework_name is None:
+            logger.error('Нет данных о работе')
+            return KeyError('Нет данных о работе')
         else:
             homework_status = homework.get('status')
-            if homework_status in HOMEWORK_STATUSES:
-                verdict = HOMEWORK_STATUSES.get(homework_status)
-                logger.info(
-                    f'Изменился статус проверки работы'
-                    f'"{homework_name}". {verdict}'
-                )
-                return (
-                    f'Изменился cтатус проверки работы'
-                    f'"{homework_name}". {verdict}'
-                )
+            if homework_status is None:
+                logger.error('Статус работы - пустой')
+                return KeyError('Статс работы неизвестен')
             else:
-                logger.error('Некорректный статус проверки на API')
-                return (f'Не изменился cтатус работы {old_homework_name}')
+                homework_status = homework.get('status')
+                if homework_status in HOMEWORK_STATUSES:
+                    verdict = HOMEWORK_STATUSES.get(homework_status)
+                    logger.info(
+                        f'Cтатус проверки работы'
+                        f'"{homework_name}". {verdict}'
+                    )
+                    return (
+                        f'Cтатус проверки работы'
+                        f'"{homework_name}". {verdict}'
+                    )
+                else:
+                    logger.error('Некорректный статус проверки на API')
+                    return KeyError('Не изменился cтатус работы')
 
 
 def check_tokens():
