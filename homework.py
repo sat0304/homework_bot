@@ -89,8 +89,8 @@ def parse_status(homework):
     try:
         if homework is None:
             logger.error('Работа на проверку не загружена')
-    except: 
-        raise ValueError('Работа на проверку не загружена')
+    except:
+        pass
     else:
         homework_name = homework.get('homework_name')
         old_homework_name = homework_name
@@ -99,9 +99,9 @@ def parse_status(homework):
             if homework_status is None:
                 logger.error('Статус работы - пустой')
         except:
-            raise ValueError('Статус работы - пустой')
+            pass
         else:
-            homework_status = homework.get('status')   
+            homework_status = homework.get('status')
             if homework_status in HOMEWORK_STATUSES:
                 verdict = HOMEWORK_STATUSES.get(homework_status)
                 logger.info(
@@ -114,7 +114,7 @@ def parse_status(homework):
                 )
             else:
                 logger.error('Некорректный статус проверки на API')
-                return (f'Не изменился cтатус проверки работы "{old_homework_name}"')
+                return ('Не изменился cтатус проверки работы')
 
 
 def check_tokens():
