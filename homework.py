@@ -69,24 +69,39 @@ def check_response(response):
             cur_date = response['current_date']
             logger.info(f'Дата проверки API Практикум.Домашка {cur_date}')
             homeworks = response['homeworks']
-            try:
-                if type(homeworks) == list:
-                    logger.info('Получен список от API Практикум.Домашка')
-                    return homeworks
-            except TypeError('Получен пустой список'):
-                logger.error('Получен пустой список от API Практикум.Домашка')
-                return []
     except TypeError('Получен неправильный результат'):
         logger.error('Получен неправильный результат')
-        return []
+    else:
+        try:
+            if type(homeworks) == list:
+                logger.info('Получен список от API Практикум.Домашка')
+                return homeworks
+        except TypeError('Получен пустой список'):
+            logger.error('Получен пустой список от API Практикум.Домашка')
+            return []
+        else:
+            return []
 
 
 def parse_status(homework):
     """Извлечение данных из ответа API сайта Практикум.Домашка."""
-    homework_name = homework.get('homework_name')
-    homework_status = homework.get('status')
-    if homework_name is not None:
-        if homework_status is not None:
+    old_homework_name = 'Старая'
+    try:
+        if homework is None:
+            logger.error('Работа на проверку не загружена')
+    except: 
+        raise ValueError('Работа на проверку не загружена')
+    else:
+        homework_name = homework.get('homework_name')
+        old_homework_name = homework_name
+        homework_status = homework.get('status')
+        try:
+            if homework_status is None:
+                logger.error('Статус работы - пустой')
+        except:
+            raise ValueError('Статус работы - пустой')
+        else:
+            homework_status = homework.get('status')   
             if homework_status in HOMEWORK_STATUSES:
                 verdict = HOMEWORK_STATUSES.get(homework_status)
                 logger.info(
@@ -99,13 +114,7 @@ def parse_status(homework):
                 )
             else:
                 logger.error('Некорректный статус проверки на API')
-                return ('Не изменился cтатус проверки работы')
-        else:
-            logger.error('Пустой статус проверки на API')
-            return ('Не изменился cтатус проверки работы')
-    else:
-        logger.error('Некорректное имя работы на API Практикум.Домашка')
-        return ('Не изменился cтатус проверки работы')
+                return (f'Не изменился cтатус проверки работы "{old_homework_name}"')
 
 
 def check_tokens():
