@@ -85,7 +85,7 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлечение данных из ответа API сайта Практикум.Домашка."""
-    if homework is []:
+    if homework[0] is None:
         logger.error('Работа на проверку не загружена')
         return KeyError('Пустой список работ')
     else:
