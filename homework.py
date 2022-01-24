@@ -144,7 +144,7 @@ def main():
                         f'Изменился статус проверки работы {homework_1}'
                     )
                     old_homework = homework_1
-                    send_message(bot, f'Изменился {homework_1}')
+                    send_message(bot, f'{homework_1}')
             t.sleep(RETRY_TIME)
         except Exception as error:
             logger.error(f'Сбой в работе программы: {error}')
