@@ -87,19 +87,19 @@ def parse_status(homework):
     """Извлечение данных из ответа API сайта Практикум.Домашка."""
     old_homework_name = 'Старая'
     try:
-        if homework is None:
-            logger.error('Работа на проверку не загружена')
+        homework is None
     except:
-        pass
+        logger.error('Работа на проверку не загружена')
+        raise
     else:
         homework_name = homework.get('homework_name')
         old_homework_name = homework_name
         homework_status = homework.get('status')
         try:
-            if homework_status is None:
-                logger.error('Статус работы - пустой')
+            homework_status is None
         except:
-            pass
+            logger.error('Статус работы - пустой')
+            raise
         else:
             homework_status = homework.get('status')
             if homework_status in HOMEWORK_STATUSES:
@@ -114,7 +114,7 @@ def parse_status(homework):
                 )
             else:
                 logger.error('Некорректный статус проверки на API')
-                return ('Не изменился cтатус проверки работы')
+                return (f'Не изменился cтатус работы {old_homework_name}')
 
 
 def check_tokens():
