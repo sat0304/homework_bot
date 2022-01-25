@@ -6,7 +6,10 @@ import time as t
 
 from dotenv import load_dotenv
 from http import HTTPStatus
+from json.decoder import JSONDecodeError
 from telegram import Bot
+from requests.exceptions import ConnectionError, ConnectTimeout
+from requests.exceptions import HTTPError, ReadTimeout, Timeout
 
 load_dotenv()
 
@@ -36,27 +39,44 @@ logger.addHandler(handler)
 
 def send_message(bot, message):
     """Отправка сообщения в Телеграм."""
-    bot.send_message(TELEGRAM_CHAT_ID, message)
-    logger.info('Сообщение для sat0304_bot отправлено')
+    try:
+        bot.send_message(TELEGRAM_CHAT_ID, message)
+    except Exception('Телеграм сервис недоступен'):
+        logger.error('Телеграм сервис недоступен')
+    else:
+        logger.info('Сообщение для sat0304_bot отправлено')
 
 
 def get_api_answer(current_timestamp):
     """Получение ответа API Практикум.Домашка."""
+    resp = {}
     timestamp = current_timestamp
+    # try:
+    #    t.time(timestamp)
+    # except Exception('Неправильный формат времени'):
+    #    logger.error('Неправильный формат времени')
+    # else:
     params = {'from_date': timestamp}
-    if params['from_date'] == current_timestamp:
+    try:
+        params['from_date'] == current_timestamp
         response = requests.get(url=ENDPOINT, headers=HEADERS, params=params)
-    if response.status_code == HTTPStatus.OK:
-        logger.info('Сайт API Практикум.Домашка доступен')
-        if response is not None:
-            logger.info('Получен ответ от API Практикум.Домашка')
-            return response.json()
-        else:
-            logger.error('Получен пустой ответ API Практикум.Домашка')
+        if response.status_code == HTTPStatus.OK:
+            resp = response.json()
+    except ConnectTimeout:
+        logger.error('Connect Timeout')
+    except ConnectionError:
+        logger.error('Connection Error')
+    except ReadTimeout:
+        logger.error('Read Timeout')
+    except Timeout:
+        logger.error('Timeout')
+    except HTTPError:
+        logger.error('HTTP Error')
+    except JSONDecodeError:
+        logger.error('JSON Decode Error')
     else:
-        raise SystemError(
-            f'Недоступен API Практикум.Домашка {response.status_code}'
-        )
+        logger.info('Сайт API Практикум.Домашка доступен')
+        return resp
 
 
 def check_response(response):
@@ -106,22 +126,25 @@ def parse_status(homework):
 
 def check_tokens():
     """Проверяем доступность переменных окружения."""
+    TOKEN_DICT = {
+        'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
+        'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
+        'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID
+    }
     token_error = ('Отсутствует переменная окружения: ')
-    token = True
-    if PRACTICUM_TOKEN is None:
-        token = False
-        logger.critical(f'{token_error}PRACTICUM_TOKEN')
-    elif TELEGRAM_TOKEN is None:
-        token = False
-        logger.critical(f'{token_error}TELEGRAM_TOKEN')
-    elif TELEGRAM_CHAT_ID is None:
-        token = False
-        logger.critical(f'{token_error}TELEGRAM_CHAT_ID')
-    return token
+    result = None
+    for token in TOKEN_DICT.keys():
+        if (TOKEN_DICT[token] is None):
+            logger.critical(f'{token_error}{token}')
+            result = False
+        else:
+            result = True
+    return result
 
 
 def main():
     """Основная логика работы бота."""
+    old_error = '1'
     if check_tokens():
         bot = Bot(token=TELEGRAM_TOKEN)
         current_timestamp = int(t.time()) - RETRY_TIME
@@ -133,7 +156,6 @@ def main():
             response = get_api_answer(current_timestamp)
             current_timestamp = response.get('current_date')
             homework = check_response(response)
-            old_error = None
             if len(homework) > 0:
                 homework_1 = parse_status(homework[0])
                 if homework_1 != old_homework:
