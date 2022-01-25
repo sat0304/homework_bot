@@ -49,7 +49,7 @@ def send_message(bot, message):
 
 def get_api_answer(current_timestamp):
     """Получение ответа API Практикум.Домашка."""
-    resp = {}
+    resp = []
     timestamp = current_timestamp
     # try:
     #    t.time(timestamp)
@@ -62,6 +62,16 @@ def get_api_answer(current_timestamp):
         response = requests.get(url=ENDPOINT, headers=HEADERS, params=params)
         if response.status_code == HTTPStatus.OK:
             resp = response.json()
+        elif response.status_code == HTTPStatus.NOT_FOUND:
+            logger.error('Страницы не существует')
+            return []
+        elif response.status_code == HTTPStatus.FORBIDDEN:
+            logger.error('Нет авторизации')
+            return []
+        else:
+            raise SystemError(
+                f'Недоступен API Практикум.Домашка {response.status_code}'
+            )
     except ConnectTimeout:
         logger.error('Connect Timeout')
     except ConnectionError:
