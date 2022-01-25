@@ -62,12 +62,6 @@ def get_api_answer(current_timestamp):
         response = requests.get(url=ENDPOINT, headers=HEADERS, params=params)
         if response.status_code == HTTPStatus.OK:
             resp = response.json()
-        elif response.status_code == HTTPStatus.NOT_FOUND:
-            logger.error('Страницы не существует')
-            return []
-        elif response.status_code == HTTPStatus.FORBIDDEN:
-            logger.error('Нет авторизации')
-            return []
         else:
             raise SystemError(
                 f'Недоступен API Практикум.Домашка {response.status_code}'
